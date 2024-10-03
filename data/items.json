@@ -1,0 +1,26 @@
+[
+    {
+        "id": 1,
+        "name": "Laptop",
+        "price": 999.99,
+        "category": 1,
+        "description": "A high-performance laptop.",
+        "stock": 50
+    },
+    {
+        "id": 2,
+        "name": "Smartphone",
+        "price": 499.99,
+        "category": 1,
+        "description": "A latest model smartphone.",
+        "stock": 100
+    },
+    {
+        "id": 3,
+        "name": "T-shirt",
+        "price": 19.99,
+        "category": 2,
+        "description": "A comfortable cotton t-shirt.",
+        "stock": 200
+    }
+]
