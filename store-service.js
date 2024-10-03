@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
+// Global arrays to hold items and categories
 let items = [];
 let categories = [];
 
@@ -17,38 +18,28 @@ function readJSONFile(filePath) {
     });
 }
 
-// Function to initialize the service
+// Initialize function to read and parse the items and categories data
 function initialize() {
-    return Promise.all([
-        readJSONFile(path.join(__dirname, 'data', 'categories.json')).then(data => {
-            categories = data;
-        }),
-        readJSONFile(path.join(__dirname, 'data', 'items.json')).then(data => {
-            items = data;
+    return readJSONFile(path.join(__dirname, 'data', 'items.json'))
+        .then(parsedItems => {
+            items = parsedItems; // Assign parsed items to the global array
+            return readJSONFile(path.join(__dirname, 'data', 'categories.json'));
         })
-    ]).catch(err => {
-        throw new Error("Error reading data files: " + err);
-    });
-}
-
-// Function to get all categories
-function getCategories() {
-    return new Promise((resolve, reject) => {
-        if (categories.length === 0) {
-            reject("No categories found");
-        } else {
-            resolve(categories);
-        }
-    });
+        .then(parsedCategories => {
+            categories = parsedCategories; // Assign parsed categories to the global array
+        })
+        .catch(err => {
+            return Promise.reject("Unable to read files: " + err); // Reject with error message
+        });
 }
 
 // Function to get all items
 function getAllItems() {
     return new Promise((resolve, reject) => {
         if (items.length === 0) {
-            reject("No items found");
+            reject("No results returned for items");
         } else {
-            resolve(items);
+            resolve(items); // Resolve with items
         }
     });
 }
@@ -60,15 +51,26 @@ function getPublishedItems() {
         if (publishedItems.length === 0) {
             reject("No published items found");
         } else {
-            resolve(publishedItems);
+            resolve(publishedItems); // Resolve with published items
         }
     });
 }
 
-// Export the functions so that they can be used in server.js
+// Function to get all categories
+function getCategories() {
+    return new Promise((resolve, reject) => {
+        if (categories.length === 0) {
+            reject("No results returned for categories");
+        } else {
+            resolve(categories); // Resolve with categories
+        }
+    });
+}
+
+// Export the functions so they can be used in server.js
 module.exports = {
     initialize,
-    getCategories,
     getAllItems,
-    getPublishedItems
+    getPublishedItems,
+    getCategories
 };
