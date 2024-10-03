@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nrm7007/web-322-A2.git"
+    "url": "https://github.com/nrm7007/web322-app.git"
   },
   "author": "Netra Rana Magar",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/nrm7007/web-322-A2/issues"
+    "url": "https://github.com/nrm7007/web322-app/issues"
   },
-  "homepage": "https://github.com/nrm7007/web-322-A2#readme",
+  "homepage": "https://github.com/nrm7007/web322-app#readme",
   "dependencies": {
     "express": "^4.21.0"
   }
