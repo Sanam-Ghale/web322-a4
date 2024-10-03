@@ -43,3 +43,21 @@ const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
     console.log(`Express http server listening on port ${PORT}`);
 });
+
+// Route for "/shop" - return only the published items
+app.get('/shop', (req, res) => {
+    storeService.getItems()
+        .then(items => {
+            // Filter items to only include those with published == true
+            const publishedItems = items.filter(item => item.published === true);
+            res.json(publishedItems);
+        })
+        .catch(err => {
+            res.status(500).send("Unable to retrieve shop items");
+        });
+});
+
+// Handle 404 errors - non-matching routes
+app.use((req, res) => {
+    res.status(404).send("Page Not Found");
+});
