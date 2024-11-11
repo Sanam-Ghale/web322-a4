@@ -13,34 +13,20 @@
     <body>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
             <div class="container-fluid">
-        
+                <!-- Brand and toggle get grouped for better mobile display -->
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <a class="navbar-brand" href="#">Web322 – Assignment 3 - Netra Rana Magar</a>
+                <a class="navbar-brand" href="#">Web322 – Assignment 4 - Netra Rana Magar</a>
 
-               
+                <!-- Collect the nav links, forms, and other content for toggling -->
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/shop">Shop</a>
-                        </li>
-                        <li class="nav-item active">
-                            <a class="nav-link" href="/about">About</a>
-                        </li>
-                        <li class="nav-item">
-
-                            <a class="nav-link" href="/items/add">Add Item</a>
-    
-                        </li>
-                    </ul>
-                    <ul class="navbar-nav ml-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/items">Items</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/categories">Categories</a>
-                        </li>
+                        {{#navLink "/shop"}}Shop{{/navLink}}
+                        {{#navLink "/about"}}About{{/navLink}}
+                        {{#navLink "/items"}}Items{{/navLink}}
+                        {{#navLink "/categories"}}Categories{{/navLink}}
+                        {{#navLink "/items/add"}}Add Item{{/navLink}}
                     </ul>
                 </div>
                 <!-- /.navbar-collapse -->
@@ -57,10 +43,17 @@
                     <article>
                         <h2>About</h2>
                         <p>
-                            I am Netra Rana Magar, currently studying web development and learning how to build full-stack applications using various web technologies. 
-                            My interests include coding, technology, and building responsive web designs.
+                            Hi, my name is Netra Rana Magar, and I'm studying Computer Programming at Seneca College. 
+                             I've learned a lot about how to create and understand software.
                         </p>
-                        
+                        <p>
+                            I really enjoy making software that is easy to use and works well. 
+                        </p>
+                        <p>
+                            I also love learning about new technologies and keeping up with what's happening in the tech world. 
+                            Technology changes quickly, and I think it's important to stay updated. 
+                            I'm particularly interested in areas like artificial intelligence, machine learning, and cloud computing.
+                        </p>
                     </article>
                 </section>
             </div>
@@ -70,4 +63,3 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
     </body>
 </html>
-

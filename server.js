@@ -1,11 +1,11 @@
 /*********************************************************************************
 
-WEB322 – Assignment 03
+WEB322 – Assignment 04
 I declare that this assignment is my own work in accordance with Seneca  Academic Policy.  No part *  of this assignment has been copied manually or electronically from any other source (including 3rd party web sites) or distributed to other students.
 
 Name: Netra Rana Magar
 Student ID: 117314237
-Date: 23/10/2024
+Date: 11/11/2024
 Cyclic Web App URL: https://web322-app-ashy.vercel.app/
 GitHub Repository URL: https://github.com/nrm7007/web322-app.git
 
@@ -16,9 +16,10 @@ const path = require('path');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 const streamifier = require('streamifier');
+const exphbs = require('express-handlebars');
 const storeService = require('./store-service');
 const app = express();
-const upload = multer(); // For parsing multipart/form-data
+const upload = multer(); 
 
 const HTTP_PORT = process.env.PORT || 8080;
 
@@ -34,48 +35,153 @@ cloudinary.config({
 app.use(express.static(__dirname + '/public'));
 app.use(express.urlencoded({ extended: true }));
 
-// Route to redirect from "/" to "/about"
-app.get('/', (req, res) => {
-    res.redirect('/about');
+// Set Handlebars as the view engine
+app.engine('.hbs', exphbs.engine({
+    extname: '.hbs',
+    helpers: {
+        navLink: function (url, options) {
+            return (
+                '<li class="nav-item"><a ' +
+                (url == app.locals.activeRoute ? ' class="nav-link active" ' : ' class="nav-link" ') + ' href="' +
+                url +
+                '">' +
+                options.fn(this) +
+                "</a></li>"
+            );
+        },
+        equal: function (lvalue, rvalue, options) {
+            if (arguments.length < 3)
+                throw new Error("Handlebars Helper equal needs 2 parameters");
+            if (lvalue != rvalue) {
+                return options.inverse(this);
+            } else {
+                return options.fn(this);
+            }
+        },
+        safeHTML: function (context) {
+            return context;
+        }
+    }
+}));
+app.set('view engine', '.hbs');
+app.set('views', path.join(__dirname, 'views'));
+
+// Middleware for active route
+app.use(function (req, res, next) {
+    let route = req.path.substring(1);
+    app.locals.activeRoute = "/" + (isNaN(route.split('/')[1]) ? route.replace(/\/(?!.*)/, "") : route.replace(/\/(.*)/, ""));
+    app.locals.viewingCategory = req.query.category;
+    next();
 });
 
-// Route to serve the "about.html" file
+// Route to redirect from "/" to "/shop"
+app.get('/', (req, res) => {
+    res.redirect('/shop');
+});
+
+// Route to serve the "about.hbs" file
 app.get('/about', (req, res) => {
-    res.sendFile(path.join(__dirname, "/views/about.html"));
+    res.render('about');
 });
 
 // Route to get all published items
-app.get('/shop', (req, res) => {
-    storeService.getPublishedItems()
-        .then(data => res.json(data))
-        .catch(err => {
-            console.error("Error in /shop route:", err);
-            res.status(500).json({ message: err });
+app.get('/shop', async (req, res) => {
+    let viewData = {};
+
+    try {
+        let items = [];
+        if (req.query.category) {
+            items = await storeService.getPublishedItemsByCategory(req.query.category);
+        } else {
+            items = await storeService.getPublishedItems();
+        }
+        items.sort((a, b) => {
+            const dateA = new Date(a.postDate);
+            const dateB = new Date(b.postDate);
+            if (dateA.getTime() === dateB.getTime()) {
+                return b.id - a.id;
+            }
+            return dateB - dateA;
         });
+        let item = items[0];
+        viewData.items = items;
+        viewData.item = item;
+    } catch (err) {
+        viewData.message = "no results";
+    }
+
+    try {
+        let categories = await storeService.getCategories();
+        viewData.categories = categories;
+    } catch (err) {
+        viewData.categoriesMessage = "no results";
+    }
+
+    res.render("shop", { data: viewData });
+});
+
+// Route to get a specific published item by ID
+app.get('/shop/:id', async (req, res) => {
+    let viewData = {};
+
+    try {
+        let items = [];
+        if (req.query.category) {
+            items = await storeService.getPublishedItemsByCategory(req.query.category);
+        } else {
+            items = await storeService.getPublishedItems();
+        }
+        items.sort((a, b) => {
+            const dateA = new Date(a.postDate);
+            const dateB = new Date(b.postDate);
+            if (dateA.getTime() === dateB.getTime()) {
+                return b.id - a.id;
+            }
+            return dateB - dateA;
+        });
+        viewData.items = items;
+    } catch (err) {
+        viewData.message = "no results";
+    }
+
+    try {
+        viewData.item = await storeService.getItemById(req.params.id);
+    } catch (err) {
+        viewData.message = "no results";
+    }
+
+    try {
+        let categories = await storeService.getCategories();
+        viewData.categories = categories;
+    } catch (err) {
+        viewData.categoriesMessage = "no results";
+    }
+
+    res.render("shop", { data: viewData });
 });
 
 // Route to get all items with optional filters
 app.get('/items', (req, res) => {
     if (req.query.category) {
         storeService.getItemsByCategory(req.query.category)
-            .then(data => res.json(data))
+            .then(data => res.render('items', { items: data }))
             .catch(err => {
                 console.error("Error in /items route with category filter:", err);
-                res.status(500).json({ message: err });
+                res.status(500).render('items', { message: "no results" });
             });
     } else if (req.query.minDate) {
         storeService.getItemsByMinDate(req.query.minDate)
-            .then(data => res.json(data))
+            .then(data => res.render('items', { items: data }))
             .catch(err => {
                 console.error("Error in /items route with minDate filter:", err);
-                res.status(500).json({ message: err });
+                res.status(500).render('items', { message: "no results" });
             });
     } else {
         storeService.getAllItems()
-            .then(data => res.json(data))
+            .then(data => res.render('items', { items: data }))
             .catch(err => {
                 console.error("Error in /items route:", err);
-                res.status(500).json({ message: err });
+                res.status(500).render('items', { message: "no results" });
             });
     }
 });
@@ -93,16 +199,16 @@ app.get('/item/:id', (req, res) => {
 // Route to get all categories
 app.get('/categories', (req, res) => {
     storeService.getCategories()
-        .then(data => res.json(data))
+        .then(data => res.render('categories', { categories: data }))
         .catch(err => {
             console.error("Error in /categories route:", err);
-            res.status(500).json({ message: err });
+            res.status(500).render('categories', { message: "no results" });
         });
 });
 
-// New route to serve the addItem.html file
+// New route to serve the addItem.hbs file
 app.get('/items/add', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'addItem.html'));
+    res.render('addItem');
 });
 
 // Route to handle adding a new item
@@ -150,6 +256,7 @@ app.post('/items/add', upload.single('featureImage'), (req, res) => {
 
     function processItem(imageUrl) {
         req.body.featureImage = imageUrl;
+        req.body.postDate = new Date().toISOString().split('T')[0];
         console.log('Processing item with imageUrl:', imageUrl);
         // Process the req.body and add it as a new Item before redirecting to /items
         storeService.addItem(req.body)
@@ -166,7 +273,7 @@ app.post('/items/add', upload.single('featureImage'), (req, res) => {
 
 // Handle 404 - Page Not Found
 app.use((req, res) => {
-    res.status(404).send("Page Not Found");
+    res.status(404).render('404');
 });
 
 // Initialize the store service and start the server
@@ -180,4 +287,4 @@ storeService.initialize()
         console.error("Unable to start server:", err);
     });
 
-module.exports = app; 
+module.exports = app; // Export the app for Vercel

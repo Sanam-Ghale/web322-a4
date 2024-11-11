@@ -1,17 +1,31 @@
+const fs = require('fs');
+const path = require('path');
+
 let items = [];
-let categories = [
-    { id: 1, name: "Home, Garden" },
-    { id: 2, name: "Electronics, Computers, Video Games" },
-    { id: 3, name: "Clothing" },
-    { id: 4, name: "Sports & Outdoors" },
-    { id: 5, name: "Pets" }
-];
+let categories = [];
 
 // Function to initialize the data
 function initialize() {
     return new Promise((resolve, reject) => {
-        // In-memory initialization
-        resolve();
+        const itemsPath = path.join(__dirname, 'data/items.json');
+        const categoriesPath = path.join(__dirname, 'data/categories.json');
+        
+        fs.readFile(itemsPath, 'utf8', (err, data) => {
+            if (err) {
+                reject("Unable to read items.json");
+            } else {
+                items = JSON.parse(data);
+                
+                fs.readFile(categoriesPath, 'utf8', (err, data) => {
+                    if (err) {
+                        reject("Unable to read categories.json");
+                    } else {
+                        categories = JSON.parse(data);
+                        resolve();
+                    }
+                });
+            }
+        });
     });
 }
 
@@ -30,6 +44,18 @@ function getAllItems() {
 function getPublishedItems() {
     return new Promise((resolve, reject) => {
         const publishedItems = items.filter(item => item.published === true);
+        if (publishedItems.length === 0) {
+            reject('no results returned');
+        } else {
+            resolve(publishedItems);
+        }
+    });
+}
+
+// Function to get published items by category
+function getPublishedItemsByCategory(category) {
+    return new Promise((resolve, reject) => {
+        const publishedItems = items.filter(item => item.published === true && item.category == category);
         if (publishedItems.length === 0) {
             reject('no results returned');
         } else {
@@ -59,6 +85,7 @@ function addItem(itemData) {
     return new Promise((resolve, reject) => {
         itemData.id = getNextItemId();
         itemData.published = itemData.published !== undefined;
+        itemData.postDate = new Date().toISOString().split('T')[0]; // Ensure postDate is set
         items.push(itemData);
         resolve(itemData);
     });
@@ -79,7 +106,7 @@ function getItemById(id) {
 // Function to get items by category
 function getItemsByCategory(category) {
     return new Promise((resolve, reject) => {
-        const categoryItems = items.filter(item => item.category === parseInt(category));
+        const categoryItems = items.filter(item => item.category == category);
         if (categoryItems.length) {
             resolve(categoryItems);
         } else {
@@ -105,6 +132,7 @@ module.exports = {
     initialize,
     getAllItems,
     getPublishedItems,
+    getPublishedItemsByCategory,
     getCategories,
     getNextItemId,
     addItem,
