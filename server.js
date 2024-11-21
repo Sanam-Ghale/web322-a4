@@ -3,9 +3,9 @@
 WEB322 – Assignment 04
 I declare that this assignment is my own work in accordance with Seneca  Academic Policy.  No part *  of this assignment has been copied manually or electronically from any other source (including 3rd party web sites) or distributed to other students.
 
-Name: Netra Rana Magar
-Student ID: 117314237
-Date: 11/11/2024
+Name: Sanam Ghale
+Student ID: 148755226
+Date: 18/11/2024
 Cyclic Web App URL: https://web322-app-ashy.vercel.app/
 GitHub Repository URL: https://github.com/nrm7007/web322-app.git
 
