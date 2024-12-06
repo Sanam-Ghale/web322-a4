@@ -7,7 +7,7 @@ Name: Sanam Ghale
 Student ID: 148755226
 Date: 18/11/2024
 Cyclic Web App URL: https://web322-app-ashy.vercel.app/
-GitHub Repository URL: https://github.com/nrm7007/web322-app.git
+GitHub Repository URL: https://github.com/Sanam-Ghale/web322-a4.git
 
 ********************************************************************************/ 
 
